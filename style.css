@@ -1,0 +1,33 @@
+/* Временная база, чтобы страница читалась; полный дизайн — шаг 3 */
+html { scroll-behavior: smooth; }              /* плавный скролл по якорям */
+body { font-family: Arial, sans-serif; margin: 0; line-height: 1.5; color: #222; }
+.hero, .section { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+.note { color: #777; font-size: 14px; }
+
+/* Витрина: 4 колонки, на планшете/телефоне — 2 */
+.styles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 900px) { .styles-grid { grid-template-columns: repeat(2, 1fr); } }
+.style-card { margin: 0; }
+.style-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 10px; display: block; }
+.style-card figcaption { font-size: 13px; margin-top: 6px; color: #555; }
+
+/* Карточки блоков */
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
+.card { border: 1px solid #ddd; border-radius: 10px; padding: 12px 16px; }
+
+/* Кнопки и форма */
+.btn { display: inline-block; padding: 10px 18px; background: #111; color: #fff;
+       border-radius: 8px; text-decoration: none; border: none; cursor: pointer; }
+.btn-secondary { background: #eee; color: #111; }
+label { display: block; margin-bottom: 10px; font-size: 14px; }
+input, select, textarea { width: 100%; padding: 8px; margin-top: 4px;
+       border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+
+/* Референсы: отдельный блок из двух карточек с рамкой */
+.refs { display: flex; gap: 16px; }
+.ref-card { flex: 1 1 0; max-width: 220px; margin: 0; }
+.ref-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover;
+                border-radius: 10px; outline: 3px solid #111; } /* рамка отличает референс от стилей */
+.ref-card figcaption { font-size: 13px; font-weight: bold; margin-top: 6px; }
+.refs-caption { color: #555; font-size: 14px; margin: 8px 0 24px; }
