@@ -110,3 +110,6 @@ input:focus, select:focus, textarea:focus {
 .status-success { color: #16a34a; }  /* зелёный — успех */
 .status-error   { color: #dc2626; }  /* красный — ошибка */
 .btn:disabled { opacity: .6; cursor: not-allowed; } /* кнопка в процессе */
+
+/* Ссылка в тёмном подвале — заметная */
+.footer a { color: #a78bfa; }
