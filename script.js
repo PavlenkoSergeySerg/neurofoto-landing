@@ -35,16 +35,24 @@ async function onSubmit(event) {
   button.textContent = 'Отправляем...';
 
   try {
-    // Пока заглушка: выводим заявку в консоль и имитируем задержку сети.
-    // На шаге 6 здесь будет fetch('/api/lead') — отправка в ВК.
-    console.log('Заявка:', data);
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    // Отправляем заявку в serverless-функцию, она перешлёт в ВК
+    const response = await fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await response.json();
 
-    // -- 4. Успех: очищаем форму и показываем сообщение
+    // Сервер вернул ошибку — показываем её текст
+    if (!response.ok || !result.ok) {
+      throw new Error(result.error || 'Не удалось отправить. Попробуйте ещё раз.');
+    }
+
+    // -- Успех: очищаем форму и показываем сообщение
     form.reset();
     showStatus('Заявка отправлена! Свяжусь с вами в ближайшее время.', 'success');
   } catch (e) {
-    showStatus('Не удалось отправить. Попробуйте ещё раз.', 'error');
+    showStatus(e.message || 'Не удалось отправить. Попробуйте ещё раз.', 'error');
   } finally {
     // Возвращаем кнопку в любом случае (даже при ошибке)
     button.disabled = false;
