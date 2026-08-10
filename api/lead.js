@@ -1,25 +1,21 @@
-/* api/lead.js — serverless-функция Vercel.
-   Принимает заявку с формы и отправляет её тебе в ВК.
-   Токен ВК берётся ТОЛЬКО из env-переменных (process.env). */
+/* api/lead.js — заявка + фото уходят в сообщение ВК (фото — картинкой).
+   Без PHP и без почты: Vercel (Node.js) + VK API. Секреты — только в env. */
 
 export default async function handler(req, res) {
-  // Разрешаем только POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ ok: false, error: 'Метод не поддерживается' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Метод не поддерживается' });
 
   try {
-    const { name, contact, style, pack, comment } = req.body || {};
+    const { name, contact, style, pack, comment, photo } = req.body || {};
 
-    // Серверная валидация: браузеру не верим, режем длину
+    // Серверная валидация
     const cleanName = String(name || '').trim().slice(0, 100);
     const cleanContact = String(contact || '').trim().slice(0, 100);
     const cleanComment = String(comment || '').trim().slice(0, 500);
+    const cleanPhoto = (typeof photo === 'string' && photo.length < 2500000) ? photo : '';
 
     if (cleanName.length < 2) return res.status(400).json({ ok: false, error: 'Укажите имя' });
     if (cleanContact.length < 5) return res.status(400).json({ ok: false, error: 'Укажите контакт' });
 
-    // Текст сообщения для ВК
     const text =
       '🔥 Новая заявка с сайта\n' +
       'Имя: ' + cleanName + '\n' +
@@ -28,29 +24,67 @@ export default async function handler(req, res) {
       'Пакет: ' + (pack || '—') + '\n' +
       'Комментарий: ' + (cleanComment || '—');
 
-    // Отправка в ВК: токен и твой ID — из env
+    const token = process.env.VK_TOKEN;
+    const vkApi = 'https://api.vk.com/method/';
+
+    // 1) Если есть фото — загружаем его в ВК (3 шага API)
+    let attachment = '';
+    if (cleanPhoto) {
+      try {
+        // а) получаем адрес загрузки
+        const up = await fetch(vkApi + 'photos.getMessagesUploadServer?access_token=' + token + '&v=5.199').then((r) => r.json());
+        if (up.response && up.response.upload_url) {
+          // б) загружаем файл
+          const buffer = Buffer.from(cleanPhoto, 'base64');
+          const form = new FormData();
+          form.append('photo', new Blob([buffer], { type: 'image/jpeg' }), 'photo.jpg');
+          const uploaded = await fetch(up.response.upload_url, { method: 'POST', body: form }).then((r) => r.json());
+          // в) сохраняем как фото для сообщения
+          const save = await fetch(vkApi + 'photos.saveMessagePhoto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              access_token: token,
+              photo: uploaded.photo,
+              server: String(uploaded.server),
+              hash: uploaded.hash,
+              v: '5.199',
+            }).toString(),
+          }).then((r) => r.json());
+          if (save.response && save.response[0]) {
+            attachment = 'photo' + save.response[0].owner_id + '_' + save.response[0].id;
+          }
+        }
+      } catch (e) {
+        // Фото не загрузилось — не роняем заявку, уйдёт текстом
+        console.error('VK photo upload error:', e);
+      }
+    }
+
+    // 2) Сообщение в ВК: текст + фото (если загрузилось)
     const params = new URLSearchParams({
-      access_token: process.env.VK_TOKEN,
-      peer_id: process.env.VK_USER_ID,   // 22801196 (подставится из env)
-      random_id: String(Date.now()),     // защита от дублей
+      access_token: token,
+      peer_id: process.env.VK_USER_ID,
+      random_id: String(Date.now()),
       message: text,
       v: '5.199',
     });
+    if (attachment) params.append('attachment', attachment);
 
-    const vk = await fetch('https://api.vk.com/method/messages.send', {
+    const vk = await fetch(vkApi + 'messages.send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params.toString(),
     }).then((r) => r.json());
 
     if (vk.error) {
-      console.error('VK error:', vk.error); // видно в логах Vercel
+      console.error('VK error:', vk.error);
       return res.status(502).json({ ok: false, error: 'Не удалось отправить в ВК' });
     }
 
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ ok: false, error: 'Ошибка сервера' });
+    return res.status(500).json({ ok: false, error: 'Ошибка сервера, попробуйте ещё раз' });
   }
 }

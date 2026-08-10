@@ -1,4 +1,4 @@
-/* ==== Форма заявки: валидация и состояния (шаг 4) ==== */
+/* ==== Форма заявки: валидация и состояния */
 
 const form = document.getElementById('lead-form');
 
@@ -7,9 +7,47 @@ if (form) {
   form.addEventListener('submit', onSubmit);
 }
 
+/* Сжимаем фото в браузере перед отправкой */
+async function compressImage(file, maxSide = 1200, quality = 0.8) {
+  const dataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = reject;
+    i.src = dataUrl;
+  });
+  const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', quality).split(',')[1]; // base64 без префикса
+}
+
 async function onSubmit(event) {
   // Отключаем стандартное поведение браузера (перезагрузку страницы)
   event.preventDefault();
+    // -- 0. Фото: проверяем и сжимаем, если прикреплено
+  let photoBase64 = '';
+  const fileInput = form.elements['photo'];
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    if (!file.type.startsWith('image/')) {
+      showStatus('Прикрепить можно только изображение (JPG/PNG)', 'error');
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      showStatus('Фото больше 15 МБ — выберите файл поменьше', 'error');
+      return;
+    }
+    photoBase64 = await compressImage(file);
+  }
+
 
   // -- 1. Собираем данные.
   // ВАЖНО: используем form.elements['...'], а не form.name / form.style —
@@ -20,6 +58,7 @@ async function onSubmit(event) {
     style:   form.elements['style'].value,
     pack:    form.elements['package'].value,
     comment: form.elements['comment'].value.trim(),
+    photo:   photoBase64,
   };
 
   // -- 2. Валидация: показываем ошибку и НЕ отправляем

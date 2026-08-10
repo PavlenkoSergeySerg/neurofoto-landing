@@ -113,3 +113,9 @@ input:focus, select:focus, textarea:focus {
 
 /* Ссылка в тёмном подвале — заметная */
 .footer a { color: #a78bfa; }
+
+/* Поле прикрепления фото */
+input[type="file"] { width: 100%; padding: 8px; margin-top: 4px; background: #fff;
+  border: 1px dashed var(--accent); border-radius: 10px; box-sizing: border-box; }
+.file-hint { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 400; }
+
