@@ -1,33 +1,106 @@
-/* Временная база, чтобы страница читалась; полный дизайн — шаг 3 */
-html { scroll-behavior: smooth; }              /* плавный скролл по якорям */
-body { font-family: Arial, sans-serif; margin: 0; line-height: 1.5; color: #222; }
-.hero, .section { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
-.note { color: #777; font-size: 14px; }
+/* ============ ДИЗАЙН (шаг 3) ============
+   Палитра: светлый фон + фиолетовый акцент.
+   Все цвета — в переменных :root, меняются в одном месте. */
 
-/* Витрина: 4 колонки, на планшете/телефоне — 2 */
+:root {
+  --bg: #f7f7f9;          /* фон страницы */
+  --ink: #16161d;         /* основной текст */
+  --muted: #6b6b76;       /* серый текст */
+  --accent: #7c3aed;      /* фиолетовый акцент */
+  --accent-dark: #5b21b6; /* акцент при наведении */
+  --card: #ffffff;        /* фон карточек */
+  --border: #e6e6ee;      /* границы */
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Manrope', Arial, sans-serif; /* fallback — Arial */
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+/* ---- Контейнеры и типографика ---- */
+.hero, .section { max-width: 960px; margin: 0 auto; padding: 48px 16px; }
+h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; font-weight: 800; margin: 0 0 16px; }
+h2 { font-size: clamp(22px, 3.5vw, 32px); font-weight: 800; margin: 0 0 12px; }
+h3 { font-size: 17px; margin: 0 0 6px; }
+.note { color: var(--muted); font-size: 14px; }
+
+/* ---- Первый экран: карточка с градиентом ---- */
+.hero {
+  margin: 24px auto 0;
+  padding: 56px 24px;
+  background: linear-gradient(135deg, #efe9ff 0%, #ffffff 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+@media (max-width: 700px) { .hero { margin: 16px; padding: 40px 20px; } }
+
+.hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+/* ---- Кнопки ---- */
+.btn {
+  display: inline-block; padding: 12px 22px; border-radius: 10px;
+  background: var(--accent); color: #fff; font-weight: 700; font-size: 15px;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: background .2s, transform .1s;
+}
+.btn:hover { background: var(--accent-dark); }
+.btn:active { transform: scale(.98); }
+.btn-secondary { background: #fff; color: var(--ink); border: 1px solid var(--border); }
+.btn-secondary:hover { background: #fff; color: var(--accent); border-color: var(--accent); }
+
+/* ---- Референсы: отдельный блок ---- */
+.refs { display: flex; gap: 16px; }
+.ref-card { flex: 1 1 0; max-width: 220px; margin: 0; }
+.ref-card img {
+  width: 100%; aspect-ratio: 4/5; object-fit: cover;
+  border-radius: 14px; outline: 3px solid var(--accent); /* акцентная рамка */
+}
+.ref-card figcaption { font-size: 13px; font-weight: 700; margin-top: 6px; }
+.refs-caption { color: var(--muted); font-size: 14px; margin: 8px 0 24px; }
+
+/* ---- Витрина стилей ---- */
 .styles-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 @media (max-width: 900px) { .styles-grid { grid-template-columns: repeat(2, 1fr); } }
 .style-card { margin: 0; }
-.style-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 10px; display: block; }
-.style-card figcaption { font-size: 13px; margin-top: 6px; color: #555; }
+.style-card img {
+  width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block;
+  border-radius: 14px; box-shadow: 0 4px 14px rgba(22,22,29,.08);
+}
+.style-card figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
 
-/* Карточки блоков */
+/* ---- Карточки блоков («для кого», «пакеты») ---- */
 .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
-.card { border: 1px solid #ddd; border-radius: 10px; padding: 12px 16px; }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(22,22,29,.04);
+}
 
-/* Кнопки и форма */
-.btn { display: inline-block; padding: 10px 18px; background: #111; color: #fff;
-       border-radius: 8px; text-decoration: none; border: none; cursor: pointer; }
-.btn-secondary { background: #eee; color: #111; }
-label { display: block; margin-bottom: 10px; font-size: 14px; }
-input, select, textarea { width: 100%; padding: 8px; margin-top: 4px;
-       border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+/* ---- Шаги «как это работает» ---- */
+.steps li { margin-bottom: 8px; }
 
-/* Референсы: отдельный блок из двух карточек с рамкой */
-.refs { display: flex; gap: 16px; }
-.ref-card { flex: 1 1 0; max-width: 220px; margin: 0; }
-.ref-card img { width: 100%; aspect-ratio: 4/5; object-fit: cover;
-                border-radius: 10px; outline: 3px solid #111; } /* рамка отличает референс от стилей */
-.ref-card figcaption { font-size: 13px; font-weight: bold; margin-top: 6px; }
-.refs-caption { color: #555; font-size: 14px; margin: 8px 0 24px; }
+/* ---- Форма ---- */
+#lead-form { max-width: 560px; }
+label { display: block; margin-bottom: 12px; font-size: 14px; font-weight: 500; }
+input, select, textarea {
+  width: 100%; padding: 10px 12px; margin-top: 4px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: #fff; box-sizing: border-box; font-family: inherit; font-size: 15px;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--accent); border-color: transparent;
+}
+
+/* ---- Подвал: тёмный, на всю ширину ---- */
+.footer {
+  max-width: none; margin-top: 32px; padding: 32px 16px;
+  background: var(--ink); color: #c9c9d4;
+}
+.footer p { max-width: 960px; margin: 0 auto 8px; }
+.footer .note { color: #8a8a96; }
