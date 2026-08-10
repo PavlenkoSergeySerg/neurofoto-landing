@@ -104,3 +104,9 @@ input:focus, select:focus, textarea:focus {
 }
 .footer p { max-width: 960px; margin: 0 auto 8px; }
 .footer .note { color: #8a8a96; }
+
+/* ---- Сообщения формы (шаг 4) ---- */
+#form-status { margin-top: 12px; font-size: 14px; font-weight: 600; }
+.status-success { color: #16a34a; }  /* зелёный — успех */
+.status-error   { color: #dc2626; }  /* красный — ошибка */
+.btn:disabled { opacity: .6; cursor: not-allowed; } /* кнопка в процессе */
