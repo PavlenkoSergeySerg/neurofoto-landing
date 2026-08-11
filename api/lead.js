@@ -41,7 +41,7 @@ export default async function handler(req, res) {
           const uploaded = await fetch(up.response.upload_url, { method: 'POST', body: form }).then((r) => r.json());
           console.log('VK upload:', JSON.stringify(uploaded).slice(0, 200));
 
-          const save = await fetch(vkApi + 'photos.saveMessagePhoto', {
+          const save = await fetch(vkApi + 'photos.saveMessagesPhoto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
