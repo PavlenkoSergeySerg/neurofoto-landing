@@ -27,36 +27,39 @@ export default async function handler(req, res) {
     const token = process.env.VK_TOKEN;
     const vkApi = 'https://api.vk.com/method/';
 
-    // 1) Если есть фото — загружаем его в ВК (3 шага API)
+        // 1) Если есть фото — загружаем в ВК, теперь с логами каждого шага
     let attachment = '';
     if (cleanPhoto) {
       try {
-        // а) получаем адрес загрузки
         const up = await fetch(vkApi + 'photos.getMessagesUploadServer?access_token=' + token + '&v=5.199').then((r) => r.json());
+        console.log('VK getUploadServer:', JSON.stringify(up).slice(0, 200));
+
         if (up.response && up.response.upload_url) {
-          // б) загружаем файл
           const buffer = Buffer.from(cleanPhoto, 'base64');
           const form = new FormData();
           form.append('photo', new Blob([buffer], { type: 'image/jpeg' }), 'photo.jpg');
           const uploaded = await fetch(up.response.upload_url, { method: 'POST', body: form }).then((r) => r.json());
-          // в) сохраняем как фото для сообщения
+          console.log('VK upload:', JSON.stringify(uploaded).slice(0, 200));
+
           const save = await fetch(vkApi + 'photos.saveMessagePhoto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
               access_token: token,
-              photo: uploaded.photo,
-              server: String(uploaded.server),
-              hash: uploaded.hash,
+              photo: String(uploaded.photo || ''),
+              server: String(uploaded.server || ''),
+              hash: String(uploaded.hash || ''),
               v: '5.199',
             }).toString(),
           }).then((r) => r.json());
+          console.log('VK save:', JSON.stringify(save).slice(0, 300));
+
           if (save.response && save.response[0]) {
             attachment = 'photo' + save.response[0].owner_id + '_' + save.response[0].id;
           }
         }
+        console.log('attachment:', attachment);
       } catch (e) {
-        // Фото не загрузилось — не роняем заявку, уйдёт текстом
         console.error('VK photo upload error:', e);
       }
     }
