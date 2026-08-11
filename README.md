@@ -47,7 +47,7 @@ https://neurofoto-landing.vercel.app
 
 ## Видео-демо
 
-(ссылка появится после записи — шаг 8.3)
+https://vkvideo.ru/video-238049267_456239058
 
 ## Что улучшу дальше
 
