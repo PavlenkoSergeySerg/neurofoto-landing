@@ -127,3 +127,7 @@ input[type="file"] { width: 100%; padding: 8px; margin-top: 4px; background: #ff
   height: 1px;
   opacity: 0;
 }
+/* Отдельная строка политики в футере — наследует стиль .consent + небольшой отступ */
+.footer-legal {
+  margin-top: 10px;
+}
