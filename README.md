@@ -55,3 +55,10 @@ https://vkvideo.ru/video-238049267_456239058
 - Квиз подбора стиля
 - Калькулятор стоимости
 - Свой домен
+
+## Архитектура (с 06.10.2026)
+- Фронтенд: статика на Layero (spa) — https://neurofoto-landing.layero.app
+- Бэкенд: neurofoto-api (Layero, node_web) — POST /lead
+- Заявка: форма -> POST /lead -> сообщение ВК с фото клиента
+- Секреты: только env-переменные проектов Layero
+- Защита формы: honeypot + rate-limit + серверная валидация
