@@ -1,6 +1,7 @@
 /* ==== Форма заявки: валидация и состояния */
 
 const form = document.getElementById('lead-form');
+const API_URL = 'https://neurofoto-api.layero.app/lead';
 
 // Если формы на странице нет — скрипт молча завершается без ошибок
 if (form) {
@@ -59,6 +60,7 @@ async function onSubmit(event) {
     pack:    form.elements['package'].value,
     comment: form.elements['comment'].value.trim(),
     photo:   photoBase64,
+    leave_blank: document.getElementById('leave-blank').value,
   };
 
   // -- 2. Валидация: показываем ошибку и НЕ отправляем
@@ -75,7 +77,7 @@ async function onSubmit(event) {
 
   try {
     // Отправляем заявку в serverless-функцию, она перешлёт в ВК
-    const response = await fetch('/api/lead', {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -106,6 +108,7 @@ function validate(data) {
   if (!data.contact)            return 'Укажите контакт: ВК, телефон или email';
   if (data.contact.length < 5)  return 'Контакт выглядит слишком коротким';
   if (data.comment.length > 500) return 'Комментарий слишком длинный (макс. 500 символов)';
+
   return null; // ошибок нет
 }
 
